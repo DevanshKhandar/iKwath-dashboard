@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>iKwath — Smart Ayurvedic Kadha Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar -->
+    <nav class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-leaf"></i>
+                <span>iKwath</span>
+            </div>
+            <p class="tagline">Smart Ayurvedic Brewing</p>
+        </div>
+        <ul class="nav-links">
+            <li><a href="#" class="nav-link active" data-section="dashboard"><i class="fas fa-th-large"></i><span>Dashboard</span></a></li>
+            <li><a href="#" class="nav-link" data-section="recipes"><i class="fas fa-book-open"></i><span>Recipe Library</span></a></li>
+            <li><a href="#" class="nav-link" data-section="history"><i class="fas fa-clock-rotate-left"></i><span>Brew History</span></a></li>
+            <li><a href="#" class="nav-link" data-section="inventory"><i class="fas fa-boxes-stacked"></i><span>Pod Inventory</span></a></li>
+            <li><a href="#" class="nav-link" data-section="profile"><i class="fas fa-user-circle"></i><span>Health Profile</span></a></li>
+            <li><a href="#" class="nav-link" data-section="order"><i class="fas fa-cart-shopping"></i><span>Order Pods</span></a></li>
+        </ul>
+        <div class="sidebar-footer">
+            <div class="device-status">
+                <span class="status-dot online"></span>
+                <span>iKwath Device Online</span>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <button class="menu-toggle" id="menuToggle"><i class="fas fa-bars"></i></button>
+            <div class="greeting">
+                <h2>Namaste, <span id="userName">Devansh</span> 🙏</h2>
+                <p id="dateDisplay"></p>
+            </div>
+            <div class="topbar-actions">
+                <div class="notification-bell" id="notifBell">
+                    <i class="fas fa-bell"></i>
+                    <span class="notif-badge" id="notifBadge">2</span>
+                </div>
+                <div class="avatar" id="avatarBtn">
+                    <span>D</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Notification Dropdown -->
+        <div class="notif-dropdown" id="notifDropdown">
+            <h4>Notifications</h4>
+            <div class="notif-item unread">
+                <i class="fas fa-mug-hot"></i>
+                <div>
+                    <p><strong>Your Dashamoola Kadha is ready!</strong></p>
+                    <span>Brewed at 87°C — drink while warm</span>
+                    <small>2 mins ago</small>
+                </div>
+            </div>
+            <div class="notif-item unread">
+                <i class="fas fa-box-open"></i>
+                <div>
+                    <p><strong>Low stock alert!</strong></p>
+                    <span>Only 2 Trikatu pods remaining</span>
+                    <small>1 hour ago</small>
+                </div>
+            </div>
+            <div class="notif-item">
+                <i class="fas fa-calendar-check"></i>
+                <div>
+                    <p><strong>7-day streak achieved! 🔥</strong></p>
+                    <span>Keep going for a 14-day badge</span>
+                    <small>Yesterday</small>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== DASHBOARD SECTION ==================== -->
+        <section class="content-section active" id="section-dashboard">
+            <!-- Live Brew Status -->
+            <div class="section-title">
+                <h3><i class="fas fa-fire"></i> Live Brew Status</h3>
+            </div>
+            <div class="brew-status-card">
+                <div class="brew-left">
+                    <div class="temp-gauge">
+                        <svg viewBox="0 0 200 200" class="gauge-svg">
+                            <circle cx="100" cy="100" r="85" class="gauge-bg"/>
+                            <circle cx="100" cy="100" r="85" class="gauge-fill" id="gaugeFill"/>
+                        </svg>
+                        <div class="gauge-text">
+                            <span class="temp-value" id="tempValue">87</span>
+                            <span class="temp-unit">°C</span>
+                        </div>
+                    </div>
+                    <p class="brew-recipe-name" id="brewRecipeName">Dashamoola Kvatha</p>
+                    <span class="brew-badge brewing" id="brewBadge">Brewing</span>
+                </div>
+                <div class="brew-right">
+                    <div class="brew-info-row">
+                        <div class="brew-info-item">
+                            <i class="fas fa-droplet"></i>
+                            <div>
+                                <small>Volume</small>
+                                <strong id="brewVolume">400 → 100 mL</strong>
+                            </div>
+                        </div>
+                        <div class="brew-info-item">
+                            <i class="fas fa-clock"></i>
+                            <div>
+                                <small>Time Remaining</small>
+                                <strong id="brewTime">08:32</strong>
+                            </div>
+                        </div>
+                        <div class="brew-info-item">
+                            <i class="fas fa-weight-scale"></i>
+                            <div>
+                                <small>Current Weight</small>
+                                <strong id="brewWeight">256g</strong>
+                            </div>
+                        </div>
+                        <div class="brew-info-item">
+                            <i class="fas fa-wave-square"></i>
+                            <div>
+                                <small>UAE Pulses</small>
+                                <strong id="brewPulses">12 / 20</strong>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="progress-section">
+                        <div class="progress-label">
+                            <span>Brew Progress</span>
+                            <span id="progressPercent">62%</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progressFill" style="width:62%"></div>
+                        </div>
+                        <div class="progress-steps">
+                            <span class="step done"><i class="fas fa-check"></i> Pod Scanned</span>
+                            <span class="step done"><i class="fas fa-check"></i> Pre-Wet</span>
+                            <span class="step active"><i class="fas fa-spinner fa-spin"></i> UAE Extract</span>
+                            <span class="step"><i class="fas fa-circle"></i> Vacuum Reduce</span>
+                            <span class="step"><i class="fas fa-circle"></i> Dispense</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Streak Calendar + Quick Stats -->
+            <div class="dashboard-grid">
+                <div class="card streak-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-calendar-days"></i> Kadha Streak</h3>
+                        <span class="streak-count" id="streakCount">🔥 7 days</span>
+                    </div>
+                    <div class="streak-calendar" id="streakCalendar"></div>
+                    <div class="streak-legend">
+                        <span><span class="dot missed"></span> Missed</span>
+                        <span><span class="dot taken"></span> Taken</span>
+                        <span><span class="dot today"></span> Today</span>
+                    </div>
+                </div>
+                <div class="card stats-card">
+                    <div class="card-header">
+                        <h3><i class="fas fa-chart-simple"></i> This Month</h3>
+                    </div>
+                    <div class="stats-grid">
+                        <div class="stat-item">
+                            <div class="stat-icon green"><i class="fas fa-mug-hot"></i></div>
+                            <div>
+                                <span class="stat-number" id="statBrews">23</span>
+                                <small>Total Brews</small>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon saffron"><i class="fas fa-temperature-three-quarters"></i></div>
+                            <div>
+                                <span class="stat-number" id="statAvgTemp">86.4°C</span>
+                                <small>Avg Temperature</small>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon brown"><i class="fas fa-boxes-stacked"></i></div>
+                            <div>
+                                <span class="stat-number" id="statPodsUsed">23</span>
+                                <small>Pods Used</small>
+                            </div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-icon green"><i class="fas fa-trophy"></i></div>
+                            <div>
+                                <span class="stat-number" id="statCompliance">88%</span>
+                                <small>Compliance</small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== RECIPE LIBRARY SECTION ==================== -->
+        <section class="content-section" id="section-recipes">
+            <div class="section-title">
+                <h3><i class="fas fa-book-open"></i> AFI Kvatha Curna — Recipe Library</h3>
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" id="recipeSearch" placeholder="Search formulations...">
+                </div>
+            </div>
+            <div class="recipe-filters" id="recipeFilters">
+                <button class="filter-btn active" data-filter="all">All (33)</button>
+                <button class="filter-btn" data-filter="immunity">Immunity</button>
+                <button class="filter-btn" data-filter="digestive">Digestive</button>
+                <button class="filter-btn" data-filter="respiratory">Respiratory</button>
+                <button class="filter-btn" data-filter="joint">Joint & Pain</button>
+                <button class="filter-btn" data-filter="fever">Fever</button>
+            </div>
+            <div class="recipe-grid" id="recipeGrid"></div>
+
+            <!-- Recipe Detail Modal -->
+            <div class="modal-overlay" id="recipeModal">
+                <div class="modal-content">
+                    <button class="modal-close" id="modalClose"><i class="fas fa-times"></i></button>
+                    <div class="modal-body" id="modalBody"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== BREW HISTORY SECTION ==================== -->
+        <section class="content-section" id="section-history">
+            <div class="section-title">
+                <h3><i class="fas fa-clock-rotate-left"></i> Brew History</h3>
+                <button class="btn-primary" id="clearHistory"><i class="fas fa-trash"></i> Clear All</button>
+            </div>
+            <div class="table-wrapper">
+                <table class="data-table" id="historyTable">
+                    <thead>
+                        <tr>
+                            <th>Date & Time</th>
+                            <th>Recipe</th>
+                            <th>Temp (°C)</th>
+                            <th>Duration</th>
+                            <th>Volume</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="historyBody"></tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- ==================== POD INVENTORY SECTION ==================== -->
+        <section class="content-section" id="section-inventory">
+            <div class="section-title">
+                <h3><i class="fas fa-boxes-stacked"></i> Pod Inventory</h3>
+                <button class="btn-primary" id="addPodBtn"><i class="fas fa-plus"></i> Add Pods</button>
+            </div>
+            <div class="inventory-grid" id="inventoryGrid"></div>
+
+            <!-- Add Pod Modal -->
+            <div class="modal-overlay" id="addPodModal">
+                <div class="modal-content modal-small">
+                    <button class="modal-close" id="addPodModalClose"><i class="fas fa-times"></i></button>
+                    <h3>Add Pods to Inventory</h3>
+                    <form id="addPodForm">
+                        <label>Recipe Name</label>
+                        <select id="podRecipeSelect"></select>
+                        <label>Quantity</label>
+                        <input type="number" id="podQuantity" min="1" max="50" value="5">
+                        <button type="submit" class="btn-primary full-width">Add to Inventory</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== HEALTH PROFILE SECTION ==================== -->
+        <section class="content-section" id="section-profile">
+            <div class="section-title">
+                <h3><i class="fas fa-user-circle"></i> Health Profile</h3>
+                <button class="btn-primary" id="editProfileBtn"><i class="fas fa-pen"></i> Edit</button>
+            </div>
+            <div class="profile-grid">
+                <div class="card profile-card">
+                    <div class="profile-avatar-large">D</div>
+                    <h2 id="profileName">Devansh</h2>
+                    <p class="profile-subtitle" id="profileAge">Age: 21</p>
+                    <div class="prakriti-badge" id="prakritiType">
+                        <i class="fas fa-om"></i> Vata-Pitta Prakriti
+                    </div>
+                </div>
+                <div class="card">
+                    <h4><i class="fas fa-stethoscope"></i> Prescribed Kadhas</h4>
+                    <div class="prescribed-list" id="prescribedList">
+                        <div class="prescribed-item">
+                            <span class="rx-name">Dashamoola Kvatha</span>
+                            <span class="rx-freq">Daily — Morning</span>
+                            <span class="rx-doctor">Dr. Sharma (BAMS)</span>
+                        </div>
+                        <div class="prescribed-item">
+                            <span class="rx-name">Guduchi Kvatha</span>
+                            <span class="rx-freq">Alternate Days — Evening</span>
+                            <span class="rx-doctor">Dr. Sharma (BAMS)</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card">
+                    <h4><i class="fas fa-notes-medical"></i> Doctor's Notes</h4>
+                    <div class="doctor-notes" id="doctorNotes">
+                        <div class="note-item">
+                            <p>"Patient shows Vata-Pitta imbalance. Recommended Dashamoola Kvatha daily for 30 days to reduce joint inflammation and improve digestion. Maintain Mandagni temperature (85-90°C) for optimal extraction."</p>
+                            <small>— Dr. Sharma, 15 Sep 2026</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Edit Profile Modal -->
+            <div class="modal-overlay" id="editProfileModal">
+                <div class="modal-content modal-small">
+                    <button class="modal-close" id="editProfileModalClose"><i class="fas fa-times"></i></button>
+                    <h3>Edit Health Profile</h3>
+                    <form id="editProfileForm">
+                        <label>Name</label>
+                        <input type="text" id="editName" value="Devansh">
+                        <label>Age</label>
+                        <input type="number" id="editAge" value="21">
+                        <label>Prakriti Type</label>
+                        <select id="editPrakriti">
+                            <option value="Vata">Vata</option>
+                            <option value="Pitta">Pitta</option>
+                            <option value="Kapha">Kapha</option>
+                            <option value="Vata-Pitta" selected>Vata-Pitta</option>
+                            <option value="Pitta-Kapha">Pitta-Kapha</option>
+                            <option value="Vata-Kapha">Vata-Kapha</option>
+                            <option value="Tridosha">Tridosha (Balanced)</option>
+                        </select>
+                        <button type="submit" class="btn-primary full-width">Save Profile</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== ORDER PODS SECTION ==================== -->
+        <section class="content-section" id="section-order">
+            <div class="section-title">
+                <h3><i class="fas fa-cart-shopping"></i> Order Pods</h3>
+            </div>
+            <div class="order-grid">
+                <div class="order-products" id="orderProducts"></div>
+                <div class="order-cart card">
+                    <h4><i class="fas fa-shopping-bag"></i> Your Cart</h4>
+                    <div class="cart-items" id="cartItems">
+                        <p class="cart-empty">Your cart is empty</p>
+                    </div>
+                    <div class="cart-total">
+                        <span>Total:</span>
+                        <strong id="cartTotal">₹0</strong>
+                    </div>
+                    <button class="btn-primary full-width" id="checkoutBtn" disabled>
+                        <i class="fas fa-lock"></i> Proceed to Checkout
+                    </button>
+                    <p class="cart-note">* Simulated checkout for demo purposes</p>
+                </div>
+            </div>
+
+            <!-- Checkout Success Modal -->
+            <div class="modal-overlay" id="checkoutModal">
+                <div class="modal-content modal-small checkout-success">
+                    <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+                    <h3>Order Placed Successfully!</h3>
+                    <p>Your pods will be delivered in 2-3 business days.</p>
+                    <p class="order-id" id="orderId"></p>
+                    <button class="btn-primary" id="checkoutDone">Done</button>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script src="js/data.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
