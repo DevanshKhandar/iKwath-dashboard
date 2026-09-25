@@ -24,7 +24,6 @@
             <li><a href="#" class="nav-link" data-section="history"><i class="fas fa-clock-rotate-left"></i><span>Brew History</span></a></li>
             <li><a href="#" class="nav-link" data-section="inventory"><i class="fas fa-boxes-stacked"></i><span>Pod Inventory</span></a></li>
             <li><a href="#" class="nav-link" data-section="profile"><i class="fas fa-user-circle"></i><span>Health Profile</span></a></li>
-            <li><a href="#" class="nav-link" data-section="order"><i class="fas fa-cart-shopping"></i><span>Order Pods</span></a></li>
         </ul>
         <div class="sidebar-footer">
             <div class="device-status">
@@ -107,10 +106,10 @@
                 <div class="brew-right">
                     <div class="brew-info-row">
                         <div class="brew-info-item">
-                            <i class="fas fa-droplet"></i>
+                            <i class="fas fa-faucet-drip"></i>
                             <div>
-                                <small>Volume</small>
-                                <strong id="brewVolume">400 → 100 mL</strong>
+                                <small>Water Dispensed</small>
+                                <strong id="brewWaterDispensed">400 mL</strong>
                             </div>
                         </div>
                         <div class="brew-info-item">
@@ -128,10 +127,10 @@
                             </div>
                         </div>
                         <div class="brew-info-item">
-                            <i class="fas fa-wave-square"></i>
+                            <i class="fas fa-mug-hot"></i>
                             <div>
-                                <small>UAE Pulses</small>
-                                <strong id="brewPulses">12 / 20</strong>
+                                <small>Kadha Brewed</small>
+                                <strong id="brewKadhaBrewed">0 mL</strong>
                             </div>
                         </div>
                     </div>
@@ -348,40 +347,6 @@
             </div>
         </section>
 
-        <!-- ==================== ORDER PODS SECTION ==================== -->
-        <section class="content-section" id="section-order">
-            <div class="section-title">
-                <h3><i class="fas fa-cart-shopping"></i> Order Pods</h3>
-            </div>
-            <div class="order-grid">
-                <div class="order-products" id="orderProducts"></div>
-                <div class="order-cart card">
-                    <h4><i class="fas fa-shopping-bag"></i> Your Cart</h4>
-                    <div class="cart-items" id="cartItems">
-                        <p class="cart-empty">Your cart is empty</p>
-                    </div>
-                    <div class="cart-total">
-                        <span>Total:</span>
-                        <strong id="cartTotal">₹0</strong>
-                    </div>
-                    <button class="btn-primary full-width" id="checkoutBtn" disabled>
-                        <i class="fas fa-lock"></i> Proceed to Checkout
-                    </button>
-                    <p class="cart-note">* Simulated checkout for demo purposes</p>
-                </div>
-            </div>
-
-            <!-- Checkout Success Modal -->
-            <div class="modal-overlay" id="checkoutModal">
-                <div class="modal-content modal-small checkout-success">
-                    <div class="success-icon"><i class="fas fa-check-circle"></i></div>
-                    <h3>Order Placed Successfully!</h3>
-                    <p>Your pods will be delivered in 2-3 business days.</p>
-                    <p class="order-id" id="orderId"></p>
-                    <button class="btn-primary" id="checkoutDone">Done</button>
-                </div>
-            </div>
-        </section>
     </main>
 
     <script src="js/data.js"></script>
