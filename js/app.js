@@ -9,7 +9,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initHistory();
     initInventory();
     initProfile();
-    initOrder();
     startBrewSimulation();
 });
 
@@ -103,7 +102,8 @@ function updateBrewUI(pct) {
     const progressEl = document.getElementById('progressFill');
     const progressPct = document.getElementById('progressPercent');
     const weightEl = document.getElementById('brewWeight');
-    const pulsesEl = document.getElementById('brewPulses');
+    const waterDispensedEl = document.getElementById('brewWaterDispensed');
+    const kadhiBrewedEl = document.getElementById('brewKadhaBrewed');
     const timeEl = document.getElementById('brewTime');
     const gaugeEl = document.getElementById('gaugeFill');
 
@@ -111,7 +111,11 @@ function updateBrewUI(pct) {
     progressEl.style.width = Math.min(pct, 100) + '%';
     progressPct.textContent = Math.round(pct) + '%';
     weightEl.textContent = Math.round(brewData.weight) + 'g';
-    pulsesEl.textContent = brewData.pulses + ' / 20';
+    waterDispensedEl.textContent = '400 mL';
+    // Kadha brewed = target output (100 mL for 1/4th) × progress
+    const targetOutput = 100; // 400 mL ÷ 4 = 100 mL for standard 1/4th reduction
+    const kadhaReady = Math.round(targetOutput * (Math.min(pct, 100) / 100));
+    kadhiBrewedEl.textContent = kadhaReady + ' mL';
 
     const mins = Math.floor(brewData.timeLeft / 60);
     const secs = brewData.timeLeft % 60;
@@ -257,54 +261,45 @@ function openRecipeModal(r) {
         <h4><i class="fas fa-mortar-pestle" style="color:#d4820c;margin-right:6px;"></i>Ingredients (Dravyas)</h4>
         <ul>${r.ingredients.map(i => '<li>' + i + '</li>').join('')}</ul>
         <div class="modal-info-grid">
+            <div class="modal-info-item"><small>Water Volume</small><strong>${r.water} mL</strong></div>
             <div class="modal-info-item"><small>Temperature</small><strong>${r.temp}°C</strong></div>
             <div class="modal-info-item"><small>Reduction Ratio</small><strong>${r.reduction}</strong></div>
             <div class="modal-info-item"><small>Brew Time</small><strong>${r.time}</strong></div>
             <div class="modal-info-item"><small>Pod Price</small><strong>\u20B9${r.price}</strong></div>
+            <div class="modal-info-item"><small>Output Volume</small><strong>~${r.reduction === '1/8th' ? Math.round(r.water/8) : Math.round(r.water/4)} mL</strong></div>
         </div>
-        <button class="btn-primary full-width brew-modal-btn" onclick="attemptBrew('${r.name}')">
-            <i class="fas fa-mug-hot"></i> Brew This Kadha
+        <button class="btn-primary full-width brew-modal-btn" onclick="orderKadha('${r.name}', ${r.price})">
+            <i class="fas fa-cart-plus"></i> Order This Kadha
         </button>
     `;
     document.getElementById('recipeModal').classList.add('show');
 }
 
-window.attemptBrew = function(recipeName) {
-    if (isBrewing) {
-        alert('⚠️ Machine is already brewing a Kadha. Please wait for the current batch to finish.');
-        return;
+window.orderKadha = function(recipeName, price) {
+    const packPrice = price * 5;
+    const confirmed = confirm(
+        '🛒 Order: ' + recipeName + '\n\n' +
+        'Pack of 5 pods — ₹' + packPrice + '\n' +
+        'Pack of 10 pods — ₹' + (packPrice * 2) + '\n' +
+        'Pack of 15 pods — ₹' + (packPrice * 3) + '\n\n' +
+        'Click OK to place a simulated order for 5 pods.'
+    );
+    if (confirmed) {
+        // Add 5 pods to inventory
+        const inventory = getData('inventory', INVENTORY_DEFAULT);
+        const existing = inventory.find(i => i.name === recipeName);
+        if (existing) {
+            existing.count = Math.min(existing.count + 5, existing.max);
+        } else {
+            inventory.push({ name: recipeName, count: 5, max: 15 });
+        }
+        setData('inventory', inventory);
+        if (typeof renderInventory === 'function') renderInventory();
+        
+        const orderId = 'IKW-' + Date.now().toString(36).toUpperCase();
+        alert('✅ Order Placed Successfully!\n\nOrder ID: ' + orderId + '\n' + recipeName + ' × 5 pods\nTotal: ₹' + packPrice + '\n\nDelivery in 2-3 business days.\nPods have been added to your inventory.');
+        document.getElementById('recipeModal').classList.remove('show');
     }
-
-    const inventory = getData('inventory', INVENTORY_DEFAULT);
-    const pod = inventory.find(i => i.name === recipeName);
-    
-    if (!pod || pod.count <= 0) {
-        alert('❌ Out of Stock! You have 0 pods left for ' + recipeName + '. Please order more from the Order Pods section.');
-        return;
-    }
-
-    // Start new brew
-    pod.count -= 1;
-    setData('inventory', inventory);
-    
-    // Reset brew data
-    brewData = { temp: 25, weight: 425, pulses: 0, timeLeft: 720 };
-    isBrewing = true;
-    
-    // Update UI headers
-    document.getElementById('brewRecipeName').textContent = recipeName;
-    document.getElementById('brewBadge').textContent = 'Brewing';
-    document.getElementById('brewBadge').className = 'brew-badge brewing';
-    
-    document.getElementById('recipeModal').classList.remove('show');
-    
-    // Switch to dashboard tab
-    document.querySelectorAll('.nav-link')[0].click();
-    
-    // Refresh inventory UI if it's open
-    if (typeof renderInventory === 'function') renderInventory();
-    
-    alert('✅ Starting new brew: ' + recipeName + '\n1 pod deducted from inventory.');
 }
 
 /* ========== BREW HISTORY ========== */
@@ -441,114 +436,6 @@ function loadProfile() {
     document.querySelector('.avatar span').textContent = profile.name.charAt(0).toUpperCase();
 }
 
-/* ========== ORDER PODS ========== */
-let cart = [];
-
-function initOrder() {
-    cart = getData('cart', []);
-    renderOrderProducts();
-    renderCart();
-
-    document.getElementById('checkoutBtn').addEventListener('click', () => {
-        const orderId = 'IKW-' + Date.now().toString(36).toUpperCase();
-        document.getElementById('orderId').textContent = 'Order ID: ' + orderId;
-        document.getElementById('checkoutModal').classList.add('show');
-
-        // Add pods to inventory
-        const inventory = getData('inventory', INVENTORY_DEFAULT);
-        cart.forEach(ci => {
-            const existing = inventory.find(i => i.name === ci.name);
-            if (existing) {
-                existing.count = Math.min(existing.count + ci.qty, existing.max);
-            } else {
-                inventory.push({ name: ci.name, count: ci.qty, max: 15 });
-            }
-        });
-        setData('inventory', inventory);
-        cart = [];
-        setData('cart', cart);
-        renderCart();
-        renderInventory();
-    });
-
-    document.getElementById('checkoutDone').addEventListener('click', () => {
-        document.getElementById('checkoutModal').classList.remove('show');
-    });
-}
-
-function renderOrderProducts() {
-    const grid = document.getElementById('orderProducts');
-    grid.innerHTML = '';
-    const popular = RECIPES.slice(0, 12); // Show first 12 for ordering
-    popular.forEach(r => {
-        const card = document.createElement('div');
-        card.className = 'order-card';
-        const cartItem = cart.find(c => c.name === r.name);
-        const qty = cartItem ? cartItem.qty : 0;
-        card.innerHTML = `
-            <h4>${r.name}</h4>
-            <div class="order-price">\u20B9${r.price * 5} <small style="font-size:12px;color:#8a8780;font-weight:400;">/ pack of 5</small></div>
-            <p class="order-desc">${r.desc}</p>
-            <div class="qty-control">
-                <button class="qty-btn" onclick="updateCart('${r.name}', ${r.price * 5}, -1)">−</button>
-                <span class="qty-value" id="qty-${r.id}">${qty}</span>
-                <button class="qty-btn" onclick="updateCart('${r.name}', ${r.price * 5}, 1)">+</button>
-            </div>
-            <button class="btn-outline" onclick="updateCart('${r.name}', ${r.price * 5}, 1)" style="width:100%;justify-content:center;">
-                <i class="fas fa-cart-plus"></i> Add to Cart
-            </button>
-        `;
-        grid.appendChild(card);
-    });
-}
-
-function updateCart(name, price, delta) {
-    let item = cart.find(c => c.name === name);
-    if (item) {
-        item.qty += delta;
-        if (item.qty <= 0) cart = cart.filter(c => c.name !== name);
-    } else if (delta > 0) {
-        cart.push({ name, price, qty: 1 });
-    }
-    setData('cart', cart);
-    renderCart();
-    renderOrderProducts();
-}
-
-function renderCart() {
-    const container = document.getElementById('cartItems');
-    const totalEl = document.getElementById('cartTotal');
-    const checkoutBtn = document.getElementById('checkoutBtn');
-
-    if (cart.length === 0) {
-        container.innerHTML = '<p class="cart-empty">Your cart is empty</p>';
-        totalEl.textContent = '\u20B90';
-        checkoutBtn.disabled = true;
-        return;
-    }
-
-    container.innerHTML = '';
-    let total = 0;
-    cart.forEach(ci => {
-        const itemTotal = ci.price * ci.qty;
-        total += itemTotal;
-        const div = document.createElement('div');
-        div.className = 'cart-item';
-        div.innerHTML = `
-            <div>
-                <div class="cart-item-name">${ci.name}</div>
-                <small style="color:#8a8780;">x${ci.qty} packs</small>
-            </div>
-            <div style="display:flex;align-items:center;gap:12px;">
-                <span class="cart-item-price">\u20B9${itemTotal}</span>
-                <span class="cart-item-remove" onclick="updateCart('${ci.name}', ${ci.price}, -${ci.qty})"><i class="fas fa-trash"></i></span>
-            </div>
-        `;
-        container.appendChild(div);
-    });
-    totalEl.textContent = '\u20B9' + total;
-    checkoutBtn.disabled = false;
-}
 /* ========== HELPERS ========== */
 function capitalize(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
